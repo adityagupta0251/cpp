@@ -1,4 +1,4 @@
-name: C++ CI (Compile Check)
+name: C++ CI (Validated LTS)
 
 on:
   push:
@@ -6,29 +6,41 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  # This remains necessary to silence the internal runner's deprecation warning
+  # until GitHub flips the switch globally in June 2026.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
+    # 'ubuntu-latest' always points to the latest Ubuntu LTS (e.g., 24.04 or 22.04)
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    # This ensures your project environment uses the latest LTS Node version
+    - name: Setup Node.js (LTS Latest)
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'lts/*'
+
     - name: Install Compiler
       run: sudo apt-get update && sudo apt-get install -y g++
 
-    - name: Compile All Chapters
+    - name: Compile & Validate Source
       run: |
-        # This script finds every .cpp file and tries to compile it.
-        # It ensures that your notes and examples are always syntactically correct.
         success=true
         for file in $(find . -name "*.cpp"); do
           echo "Checking $file..."
-          g++ -Wall -o temp_build "$file" || success=false
-          rm -f temp_build
+          # -c checks syntax/compilation without requiring a main()
+          # -Wall -Wextra catches potential security vulnerabilities or bugs
+          g++ -Wall -Wextra -c "$file" -o temp.o || success=false
+          rm -f temp.o
         done
         
         if [ "$success" = false ]; then
-          echo "One or more files failed to compile."
+          echo "CI Failed: Syntax or logical errors found in .cpp files."
           exit 1
         fi
