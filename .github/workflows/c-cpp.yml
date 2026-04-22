@@ -1,0 +1,34 @@
+name: C++ CI (Compile Check)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Install Compiler
+      run: sudo apt-get update && sudo apt-get install -y g++
+
+    - name: Compile All Chapters
+      run: |
+        # This script finds every .cpp file and tries to compile it.
+        # It ensures that your notes and examples are always syntactically correct.
+        success=true
+        for file in $(find . -name "*.cpp"); do
+          echo "Checking $file..."
+          g++ -Wall -o temp_build "$file" || success=false
+          rm -f temp_build
+        done
+        
+        if [ "$success" = false ]; then
+          echo "One or more files failed to compile."
+          exit 1
+        fi
