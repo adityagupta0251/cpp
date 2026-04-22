@@ -8,7 +8,7 @@ public:
     unordered_map<int, int> m;
     vector<int> ans;
 
-    for (int i = 0; i < arr.size(); i++) {
+    for (size_t i = 0; i < arr.size(); i++) {
       int first = arr[i];
       int sec = tar - first;
 
