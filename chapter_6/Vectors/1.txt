@@ -1,0 +1,12 @@
+C++ STL
+STL stands for Standard Template Library
+
+
+In more detail : STL is a collection of pre-built classes and functions that make it easy to manage data using common data structures like vectors, stacks, and maps. It saves time and effort by providing ready-to-use, efficient algorithms and containers.
+
+
+STL comes in 4 Parts :
+1. Containers
+2. Iterators
+3. Algorithms
+4. Functors
